@@ -1,5 +1,5 @@
 {
-  "name": "@koffi/linux-riscv64",
+  "name": "@septh/koffi-linux-riscv64",
   "version": "2.0.0",
   "description": "The Linux RISC-V 64-bit binary for Koffi, a fast and simple C FFI (foreign function interface) for Node.js",
   "author": {

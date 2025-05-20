@@ -90,7 +90,7 @@ try {
             // Update the package's package.json.
             const [ platform, arch, libc ] = cream.split('-')
             const pkgManifest: PackageJson = await json.fromFile(path.join(pkgBase, 'package.json'))
-            pkgManifest.name = `@koffi/${cream}`
+            pkgManifest.name = `@septh/koffi-${cream}`
             pkgManifest.version = koffiVersion
             pkgManifest.os = [ platform ]
             pkgManifest.cpu = [ arch ]
@@ -123,7 +123,7 @@ try {
         console.info('Publishing all packages with npm...')
         await spawn('npm', [ 'publish', '--workspaces', '--access=public',
             // '--registry=http://localhost:4873/',    // I use Verdaccio (https://www.verdaccio.org) for local tests
-            '--dry-run'
+            // '--dry-run'
         ], { stdio: 'inherit' })
 
         // Update the repo

@@ -1,5 +1,5 @@
 {
-  "name": "@koffi/freebsd-arm64",
+  "name": "@septh/koffi-freebsd-arm64",
   "version": "2.0.0",
   "description": "The FreeBSD ARM 64-bit binary for Koffi, a fast and simple C FFI (foreign function interface) for Node.js",
   "author": {

@@ -1,5 +1,5 @@
 {
-  "name": "@koffi/win32-x64",
+  "name": "@septh/koffi-win32-x64",
   "version": "2.0.0",
   "description": "The Windows Intel/AMD 64-bit binary for Koffi, a fast and simple C FFI (foreign function interface) for Node.js",
   "author": {

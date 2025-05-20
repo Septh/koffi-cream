@@ -26,13 +26,13 @@ const { deprecate } = require('node:util')
 let native
 if (platform === 'linux' && arch === 'x64') {
     try {
-        native = require(`@koffi/linux-x64-glibc`)
+        native = require(`@septh/koffi-linux-x64-glibc`)
     }
     catch {
-        native = require(`@koffi/linux-x64-musl`)
+        native = require(`@septh/koffi-linux-x64-musl`)
     }
 }
-else native = require(`@koffi/${platform}-${arch}`)
+else native = require(`@septh/koffi-${platform}-${arch}`)
 
 module.exports = {
     ...native,

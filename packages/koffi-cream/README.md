@@ -20,7 +20,7 @@ Most importantly: **this package is neither a fork nor a patch. It *is* the orig
 
 This way, when you install `koffi-cream`, your package manager will only download and install the build that is right for your platform. For example, on Windows AMD/Intel 64 bit, your package manager will install:
 - `koffi-cream` (this package): 3.4 kB compressed / 12.8 kB uncompressed
-- `@koffi/win32-x64`: 455 kB compressed / 2.3 MB uncompressed
+- `@septh/koffi-win32-x64`: 455 kB compressed / 2.3 MB uncompressed
 
 **That's 97% off compared to the original Koffi package!**
 
@@ -31,17 +31,17 @@ This way, when you install `koffi-cream`, your package manager will only downloa
 
 `koffi-cream` only offers a subset of Koffi's 16 builds:
 
-* @koffi/darwin-arm64
-* @koffi/darwin-x64
-* @koffi/freebsd-arm64
-* @koffi/freebsd-x64
-* @koffi/linux-arm64
-* @koffi/linux-riscv64
-* @koffi/linux-x64-glibc
-* @koffi/linux-x64-musl
-* @koffi/openbsd-x64
-* @koffi/win32-arm64
-* @koffi/win32-x64
+* [@septh/koffi-darwin-arm64](https://www.npmjs.com/package/@septh/koffi-darwin-arm64)
+* [@septh/koffi-darwin-x64](https://www.npmjs.com/package/@septh/koffi-darwin-x64)
+* [@septh/koffi-freebsd-arm64](https://www.npmjs.com/package/@septh/koffi-freebsd-arm64)
+* [@septh/koffi-freebsd-x64](https://www.npmjs.com/package/@septh/koffi-freebsd-x64)
+* [@septh/koffi-linux-arm64](https://www.npmjs.com/package/@septh/koffi-linux-arm64)
+* [@septh/koffi-linux-riscv64](https://www.npmjs.com/package/@septh/koffi-linux-riscv64)
+* [@septh/koffi-linux-x64-glibc](https://www.npmjs.com/package/@septh/koffi-linux-x64-glibc)
+* [@septh/koffi-linux-x64-musl](https://www.npmjs.com/package/@septh/koffi-linux-x64-musl)
+* [@septh/koffi-openbsd-x64](https://www.npmjs.com/package/@septh/koffi-openbsd-x64)
+* [@septh/koffi-win32-arm64](https://www.npmjs.com/package/@septh/koffi-win32-arm64)
+* [@septh/koffi-win32-x64](https://www.npmjs.com/package/@septh/koffi-win32-x64)
 
 I do not plan to add other builds, especially not the 32 bit binaries. If you need these, stick with Koffi.
 

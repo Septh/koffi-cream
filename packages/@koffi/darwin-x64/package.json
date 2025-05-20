@@ -1,5 +1,5 @@
 {
-  "name": "@koffi/darwin-x64",
+  "name": "@septh/koffi-darwin-x64",
   "version": "2.0.0",
   "description": "The MacOS Intel/AMD 64-bit binary for Koffi, a fast and simple C FFI (foreign function interface) for Node.js",
   "author": {

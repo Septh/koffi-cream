@@ -1,5 +1,5 @@
 {
-  "name": "@koffi/linux-x64-musl",
+  "name": "@septh/koffi-linux-x64-musl",
   "version": "2.0.0",
   "description": "The Linux Intel/AMD 64-bit binary for Koffi, a fast and simple C FFI (foreign function interface) for Node.js",
   "author": {
