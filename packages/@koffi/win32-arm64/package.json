@@ -1,6 +1,6 @@
 {
   "name": "@septh/koffi-win32-arm64",
-  "version": "2.0.0",
+  "version": "2.11.0",
   "description": "The Windows ARM 64-bit binary for Koffi, a fast and simple C FFI (foreign function interface) for Node.js",
   "author": {
     "name": "Stephan 'Septh' Schreiber",
@@ -9,9 +9,9 @@
   },
   "contributors": [
     {
-        "name": "Niels Martignène",
-        "email": "niels.martignene@protonmail.com",
-        "url": "https://koromix.dev/"
+      "name": "Niels Martignène",
+      "email": "niels.martignene@protonmail.com",
+      "url": "https://koromix.dev/"
     }
   ],
   "keywords": [
@@ -39,5 +39,11 @@
     "yarn": ">= 3.2.0"
   },
   "type": "commonjs",
-  "main": "koffi.node"
+  "main": "koffi.node",
+  "os": [
+    "win32"
+  ],
+  "cpu": [
+    "arm64"
+  ]
 }
