@@ -1,0 +1,35 @@
+{
+  "include": [
+    "packages/**/*.js",
+    "./release.mts"
+  ],
+  "compilerOptions": {
+    "checkJs": true,
+    "resolveJsonModule": true,
+    "noEmit": true,
+
+    // Module
+    "module": "Node16",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
+    // Libs
+    "target": "ESNext",
+    "lib": [ "ESNext" ],
+    "skipLibCheck": false,
+    "skipDefaultLibCheck": true,
+
+    // Type checking
+    "strict": true,
+    "exactOptionalPropertyTypes": false,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "noUncheckedIndexedAccess": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": false,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "name": "@koffi/linux-arm64",
+  "version": "2.0.0",
+  "description": "The Linux ARM 64-bit binary for Koffi, a fast and simple C FFI (foreign function interface) for Node.js",
+  "author": {
+    "name": "Stephan 'Septh' Schreiber",
+    "email": "septh@sfr.fr",
+    "url": "https://github.com/Septh"
+  },
+  "contributors": [
+    {
+        "name": "Niels Martignène",
+        "email": "niels.martignene@protonmail.com",
+        "url": "https://koromix.dev/"
+    }
+  ],
+  "keywords": [
+    "foreign",
+    "function",
+    "interface",
+    "ffi",
+    "binding",
+    "c",
+    "napi",
+    "koffi",
+    "linux",
+    "arm64"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Septh/koffi-cream.git",
+    "directory": "packages/@koffi/linux-arm64"
+  },
+  "engines": {
+    "node": "^12.22.0 || ^14.17.0 || ^15.12.0 || >= 16",
+    "npm": ">= 10.4.0",
+    "pnpm": ">= 7.1.0",
+    "yarn": ">= 3.2.0"
+  },
+  "type": "commonjs",
+  "main": "koffi.node"
+}
