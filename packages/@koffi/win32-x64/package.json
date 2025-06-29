@@ -1,6 +1,6 @@
 {
   "name": "@septh/koffi-win32-x64",
-  "version": "2.11.0",
+  "version": "0.0.1",
   "description": "The Windows Intel/AMD 64-bit binary for Koffi, a fast and simple C FFI (foreign function interface) for Node.js",
   "author": {
     "name": "Stephan 'Septh' Schreiber",
@@ -39,11 +39,5 @@
     "yarn": ">= 3.2.0"
   },
   "type": "commonjs",
-  "main": "koffi.node",
-  "os": [
-    "win32"
-  ],
-  "cpu": [
-    "x64"
-  ]
+  "main": "koffi.node"
 }

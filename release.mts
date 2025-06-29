@@ -20,8 +20,8 @@ interface PackageJson {
 }
 
 // Some paths
-const CREAM_PACKAGES_BASE = path.join('packages', '@koffi')           // Where individual packages are stored
-const MASTER_CREAM_BASE   = path.join('packages', 'koffi-cream')      // Where our main cream package is stored
+const CREAM_PACKAGES_BASE = path.join('packages', '@koffi')         // Where individual packages are stored
+const MAIN_PACKAGE        = path.join('packages', 'koffi-cream')    // Where our main cream package is stored
 
 // This maps the various Koffi builds we support to our Cream packages.
 const koffiToCream: Record<string, string> = {
@@ -61,7 +61,7 @@ try {
         console.warn(`*** Koffi ${koffiLatest} is available!`)
 
     // Get the main package's package.json.
-    const mainManifest: PackageJson = await json.fromFile(path.join(MASTER_CREAM_BASE, 'package.json'))
+    const mainManifest: PackageJson = await json.fromFile(path.join(MAIN_PACKAGE, 'package.json'))
 
     // Do we need to update?
     if (semver.gt(koffiVersion, mainManifest.version)) {
@@ -113,7 +113,7 @@ try {
         const typings = await fs.readFile(path.join(koffiBase, 'index.d.ts'))
             .then(buf => buf.toString())
             .then(str => str.replace("declare module 'koffi'", "declare module 'koffi-cream'"))
-        await fs.writeFile(path.join(MASTER_CREAM_BASE, 'index.d.ts'), typings)
+        await fs.writeFile(path.join(MAIN_PACKAGE, 'index.d.ts'), typings)
 
         mainManifest.version = koffiVersion
         mainManifest.optionalDependencies = packages
@@ -123,12 +123,13 @@ try {
         console.info('Publishing all packages with npm...')
         await spawn('npm', [ 'publish', '--workspaces', '--access=public',
             // '--registry=http://localhost:4873/',    // I use Verdaccio (https://www.verdaccio.org) for local tests
-            // '--dry-run'
+            '--dry-run'
         ], { stdio: 'inherit' })
 
         // Update the repo
-        console.info('Updating the repo...')
+        console.info('Cleaning up the repo...')
         await Promise.all(binaries.map(bin => fs.rm(bin)))
+        await spawn('git', [ 'checkout', 'packages' ])
         await spawn('git', [ 'commit', '-a', '-m', `Update to Koffi ${koffiVersion}` ])
         await spawn('git', [ 'tag', `v${koffiVersion}`])
     }

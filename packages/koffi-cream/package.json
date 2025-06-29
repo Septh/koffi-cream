@@ -1,6 +1,6 @@
 {
   "name": "koffi-cream",
-  "version": "2.11.0",
+  "version": "0.0.1",
   "description": "A lighter packaging for Koffi, the fast and simple C FFI (foreign function interface) for Node.js",
   "author": {
     "name": "Stephan 'Septh' Schreiber",
@@ -41,16 +41,16 @@
   "main": "index.js",
   "types": "index.d.ts",
   "optionalDependencies": {
-    "@septh/koffi-darwin-arm64": "2.11.0",
-    "@septh/koffi-darwin-x64": "2.11.0",
-    "@septh/koffi-freebsd-arm64": "2.11.0",
-    "@septh/koffi-freebsd-x64": "2.11.0",
-    "@septh/koffi-linux-arm64": "2.11.0",
-    "@septh/koffi-linux-riscv64": "2.11.0",
-    "@septh/koffi-linux-x64-glibc": "2.11.0",
-    "@septh/koffi-linux-x64-musl": "2.11.0",
-    "@septh/koffi-openbsd-x64": "2.11.0",
-    "@septh/koffi-win32-arm64": "2.11.0",
-    "@septh/koffi-win32-x64": "2.11.0"
+    "@septh/koffi-darwin-arm64": "0.0.1",
+    "@septh/koffi-darwin-x64": "0.0.1",
+    "@septh/koffi-freebsd-arm64": "0.0.1",
+    "@septh/koffi-freebsd-x64": "0.0.1",
+    "@septh/koffi-linux-arm64": "0.0.1",
+    "@septh/koffi-linux-riscv64": "0.0.1",
+    "@septh/koffi-linux-x64-glibc": "0.0.1",
+    "@septh/koffi-linux-x64-musl": "0.0.1",
+    "@septh/koffi-openbsd-x64": "0.0.1",
+    "@septh/koffi-win32-arm64": "0.0.1",
+    "@septh/koffi-win32-x64": "0.0.1"
   }
 }
