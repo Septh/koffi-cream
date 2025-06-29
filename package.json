@@ -14,7 +14,7 @@
     "@septh/ts-run": "^2.0.0",
     "@types/node": "^22.14.1",
     "@types/semver": "^7.7.0",
-    "koffi": "^2.11.0",
+    "koffi": "2.12.0",
     "magic-json": "^1.0.0",
     "nano-spawn": "^1.0.1",
     "semver": "^7.7.1"
