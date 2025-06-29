@@ -47,6 +47,7 @@
     "@septh/koffi-freebsd-x64": "0.0.1",
     "@septh/koffi-linux-arm64": "0.0.1",
     "@septh/koffi-linux-riscv64": "0.0.1",
+    "@septh/koffi-linux-loong64": "0.0.1",
     "@septh/koffi-linux-x64-glibc": "0.0.1",
     "@septh/koffi-linux-x64-musl": "0.0.1",
     "@septh/koffi-openbsd-x64": "0.0.1",
