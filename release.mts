@@ -25,17 +25,18 @@ const MAIN_PACKAGE        = path.join('packages', 'koffi-cream')    // Where our
 
 // This maps the various Koffi builds we support to our Cream packages.
 const koffiToCream: Record<string, string> = {
-    darwin_arm64:  'darwin-arm64',
-    darwin_x64:    'darwin-x64',
-    freebsd_arm64: 'freebsd-arm64',
-    freebsd_x64:   'freebsd-x64',
-    linux_arm64:   'linux-arm64',
-    linux_riscv64: 'linux-riscv64',
-    linux_x64:     'linux-x64-glibc',
-    musl_x64:      'linux-x64-musl',
-    openbsd_x64:   'openbsd-x64',
-    win32_arm64:   'win32-arm64',
-    win32_x64:     'win32-x64'
+    darwin_arm64:   'darwin-arm64',
+    darwin_x64:     'darwin-x64',
+    freebsd_arm64:  'freebsd-arm64',
+    freebsd_x64:    'freebsd-x64',
+    linux_arm64:    'linux-arm64',
+    linux_riscv64d: 'linux-riscv64',
+    linux_x64:      'linux-x64-glibc',
+    musl_x64:       'linux-x64-musl',
+    linux_loong64:  'linux-loong64',
+    openbsd_x64:    'openbsd-x64',
+    win32_arm64:    'win32-arm64',
+    win32_x64:      'win32-x64'
 }
 
 try {
@@ -123,7 +124,7 @@ try {
         console.info('Publishing all packages with npm...')
         await spawn('npm', [ 'publish', '--workspaces', '--access=public',
             // '--registry=http://localhost:4873/',    // I use Verdaccio (https://www.verdaccio.org) for local tests
-            '--dry-run'
+            // '--dry-run'
         ], { stdio: 'inherit' })
 
         // Update the repo

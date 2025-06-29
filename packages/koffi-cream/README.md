@@ -44,6 +44,7 @@ This way, when you install `koffi-cream`, your package manager will only downloa
 | linux-arm64   | [@septh/koffi-linux-arm64](https://www.npmjs.com/package/@septh/koffi-linux-arm64)         |
 | linux-armhf   | ❌                                                                                        |
 | linux-ia32    | ❌                                                                                        |
+| linux-loong64 | [@septh/koffi-linux-loong64](https://www.npmjs.com/package/@septh/koffi-linux-loong64)     |
 | linux-riscv64 | [@septh/koffi-linux-riscv64](https://www.npmjs.com/package/@septh/koffi-linux-riscv64)     |
 | linux-x64     | [@septh/koffi-linux-x64-glibc](https://www.npmjs.com/package/@septh/koffi-linux-x64-glibc) |
 | musl-x64      | [@septh/koffi-linux-x64-musl](https://www.npmjs.com/package/@septh/koffi-linux-x64-musl)   |
