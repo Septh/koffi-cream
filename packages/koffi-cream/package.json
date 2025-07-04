@@ -24,7 +24,7 @@
     "napi",
     "koffi"
   ],
-  "homepage": "https://github.com/Septh/koffi-cream#readme",
+  "homepage": "https://github.com/Septh/koffi-cream/tree/main/packages/koffi-cream",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Septh/koffi-cream.git",
