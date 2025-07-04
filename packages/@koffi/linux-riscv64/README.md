@@ -1,4 +1,4 @@
-# @koffi/linux-riscv64
+# @septh/koffi-linux-riscv64
 
 This is the GNU Linux RISC-V 64-bit binary for [Koffi-Cream](https://github.com/Septh/koffi-cream), a repackaging of [Koffi](https://koffi.dev), the fast and simple C FFI (foreign function interface) for Node.js.
 

@@ -1,4 +1,4 @@
-# @koffi/linux-x64-musl
+# @septh/koffi-linux-x64-musl
 
 This is the musl Linux Intel/AMD 64-bit binary for [Koffi-Cream](https://github.com/Septh/koffi-cream), a repackaging of [Koffi](https://koffi.dev), the fast and simple C FFI (foreign function interface) for Node.js.
 
