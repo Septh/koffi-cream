@@ -28,11 +28,11 @@ This way, when you install `koffi-cream`, your package manager will only downloa
 > The `os` and `cpu` are standard properties, supported by all package managers. But the `libc` property, used to distinguish Linux distros between gnu and musl, is newer and only supported by `npm 10.4.0` and later, `pnpm 7.1.0` and later, and `yarn 3.2.0` and later.
 
 [^1]: As of 2.11.0, Koffi weights 15 MB compressed and 75 MB uncompressed!
-[^2]: Koffi's package includes 16 natives binaries (of which 15 are not compatible with your platform), the build tools and the full source code!
+[^2]: Koffi's package includes 17 natives binaries (of which 16 are not compatible with your platform), the build tools and the full source code!
 
 
 ## Available packages
-`koffi-cream` only offers a subset of Koffi's 16 native builds:
+`koffi-cream` only offers a subset of Koffi's 17 native builds:
 
 | Koffi binary  | koffi-cream package                                                                        |
 |---------------|--------------------------------------------------------------------------------------------|
