@@ -24,13 +24,13 @@
     "napi",
     "koffi",
     "linux",
-    "riscv64"
+    "loong64"
   ],
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Septh/koffi-cream.git",
-    "directory": "packages/@koffi/linux-riscv64"
+    "directory": "packages/@koffi/linux-loong64"
   },
   "engines": {
     "node": "^12.22.0 || ^14.17.0 || ^15.12.0 || >= 16",
