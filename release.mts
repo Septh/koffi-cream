@@ -11,12 +11,13 @@ interface PackageJson {
     name: string
     version: string
 
-    // Only in packages/@koffi/*/package.json
+    // Used in packages/@koffi/*/package.json
+    main: string
     os: string[]
     cpu: string[]
     libc?: string[]
 
-    // Only in packages/koffi-cream/package.json
+    // Used in packages/koffi-cream/package.json
     types: string
     optionalDependencies: Record<string, string>
 }
@@ -84,24 +85,24 @@ try {
         // - updating the package's package.json `version`, `os`, `cpu` and `libc` fields
         // - updating the main package's package.json `version` and `optionalDependencies` fields
         console.group('Packaging...')
-        const packages: Record<string, string> = {}
-        const binaries: string[] = []
+        const updatedPackages: Record<string, string> = {}
+        const copiedBinaries: string[] = []
         for (const koffiBuild in koffiToCream) {
             const cream = koffiToCream[koffiBuild]
             console.info(`${koffiBuild} => ${cream}`)
 
-            // Make sure we have a package for this build.
+            // Make sure we have a package for this build and read its manifest.
             const pkgBase = path.join(CREAM_PACKAGES, cream)
             if (!await fs.stat(pkgBase).then(stat => stat.isDirectory()).catch(() => false))
                 throw new Error(`Unsupported Koffi build ${koffiBuild}`)
+            const pkgManifest: PackageJson = await json.fromFile(path.join(pkgBase, 'package.json'))
 
             // Copy the big binary.
-            const binary = path.join(pkgBase, `koffi.node`)
-            await fs.copyFile(path.join(koffiBase, 'build', 'koffi', koffiBuild, 'koffi.node'), binary)
+            const destinationBinary = path.join(pkgBase, pkgManifest.main)
+            await fs.copyFile(path.join(koffiBase, 'build', 'koffi', koffiBuild, 'koffi.node'), destinationBinary)
 
             // Update the package's package.json.
             const [ platform, arch, libc ] = cream.split('-') as [ string, string, string | undefined ]
-            const pkgManifest: PackageJson = await json.fromFile(path.join(pkgBase, 'package.json'))
             pkgManifest.name = `@septh/koffi-${cream}`
             pkgManifest.version = koffiVersion
             pkgManifest.os = [ platform ]
@@ -111,8 +112,8 @@ try {
             await json.write(pkgManifest)
 
             // Remember this dependency and binary.
-            packages[pkgManifest.name] = pkgManifest.version
-            binaries.push(binary)
+            updatedPackages[pkgManifest.name] = pkgManifest.version
+            copiedBinaries.push(destinationBinary)
         }
         console.groupEnd()
 
@@ -122,7 +123,7 @@ try {
         console.info('Updating main package...')
         const mainManifest: PackageJson = await json.fromFile(path.join(MAIN_PACKAGE, 'package.json'))
         mainManifest.version = koffiVersion
-        mainManifest.optionalDependencies = packages
+        mainManifest.optionalDependencies = updatedPackages
         await json.write(mainManifest)
 
         const typings = await fs.readFile(path.join(koffiBase, 'index.d.ts'))
@@ -143,7 +144,7 @@ try {
         }
         finally {
             console.info('Cleaning up...')
-            await Promise.all(binaries.map(bin => fs.rm(bin)))
+            await Promise.all(copiedBinaries.map(bin => fs.rm(bin)))
             await spawn('git', [ 'checkout', 'packages' ])
 
             // Update the repo
