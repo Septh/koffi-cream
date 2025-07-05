@@ -16,6 +16,8 @@ const some_func = lib.func('int some_func(int a, int b)')
 
 
 ## The why and the how
+The discussion at https://github.com/Koromix/koffi/issues/201 explains why I decided to create `koffi-cream`.
+
 `koffi-cream` repackages Koffi using the same strategy as many popular packages in the JavaScript community like `esbuild` or `swc`: by leveraging the `optionalDependencies`, `os`, `cpu` and `libc` properties in `package.json`.
 
 This way, when you install `koffi-cream`, your package manager will only download and install the build that is right for your platform. For example, on Windows AMD/Intel 64 bit, your package manager will install:
@@ -64,7 +66,6 @@ Hence, there is no `koffi-cream` 1.x or 2.0; the first version published is 2.11
 
 
 ## Related
-- The discussion at https://github.com/Koromix/koffi/issues/201 explains why I decided to create `koffi-cream`.
 - [libwin32](https://github.com/Septh/libwin32#readme): Node bindings to native Win32 DLLs through ~~Koffi~~ koffi-cream.
 
 
