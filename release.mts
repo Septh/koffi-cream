@@ -1,6 +1,7 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import fs from 'node:fs/promises'
+import readline from 'node:readline/promises'
 import semver from 'semver'
 import spawn from 'nano-spawn'
 import json from 'magic-json'
@@ -16,12 +17,9 @@ interface PackageJson {
     libc?: string[]
 
     // Only in packages/koffi-cream/package.json
+    types: string
     optionalDependencies: Record<string, string>
 }
-
-// Some paths
-const CREAM_PACKAGES_BASE = path.join('packages', '@koffi')         // Where individual packages are stored
-const MAIN_PACKAGE        = path.join('packages', 'koffi-cream')    // Where our main cream package is stored
 
 // This maps the various Koffi builds we support to our Cream packages.
 const koffiToCream: Record<string, string> = {
@@ -30,42 +28,55 @@ const koffiToCream: Record<string, string> = {
     freebsd_arm64:  'freebsd-arm64',
     freebsd_x64:    'freebsd-x64',
     linux_arm64:    'linux-arm64',
+    linux_loong64:  'linux-loong64',
     linux_riscv64d: 'linux-riscv64',
     linux_x64:      'linux-x64-glibc',
     musl_x64:       'linux-x64-musl',
-    linux_loong64:  'linux-loong64',
     openbsd_x64:    'openbsd-x64',
     win32_arm64:    'win32-arm64',
     win32_x64:      'win32-x64'
 }
 
 try {
-
-    // Ensure a supported version of Node is used (we use import.meta.XXX).
+    // Check availability of `import.meta.dirname` and `import.meta.resolve`.
     if (!semver.satisfies(process.versions.node, '^20.11.0 || >= 22'))
         throw new Error('This script requires Node.js 20.11.0+ or 22+')
 
-    // Also ensure the script is run from the root of the monorepo.
+    // Ensure the script is run from the root of the monorepo.
     if (process.cwd() !== import.meta.dirname)
         throw new Error(`Please run ${path.basename(import.meta.filename)} from the root of the monorepo.`)
+
+    // Define some paths.
+    const CREAM_PACKAGES = path.resolve('packages', '@koffi')       // Where individual packages are stored
+    const MAIN_PACKAGE   = path.resolve('packages', 'koffi-cream')  // Where our main cream package is stored
 
     // Get the version of Koffi currently installed in the repo.
     const koffiBase = fileURLToPath(new URL('./', import.meta.resolve('koffi')))
     const { version: koffiVersion }: PackageJson = await json.fromFile(path.join(koffiBase, 'package.json'))
+    console.info(`Koffi version ${koffiVersion} found at ${koffiBase}`)
     if (semver.major(koffiVersion) !== 2)
         throw new Error('This script only supports Koffi 2.x')
 
     // Check the latest version of Koffi on npm.
     console.info("Checking latest version of Koffi on npm registry...")
     const { stdout: koffiLatest } = await spawn('npm', [ 'view', 'koffi@latest', 'version' ])
-    if (semver.gt(koffiLatest, koffiVersion))
-        console.warn(`*** Koffi ${koffiLatest} is available!`)
+    if (semver.gt(koffiLatest, koffiVersion)) {
+        const rl = readline.createInterface({ input: process.stdin, output: process.stderr, terminal: true })
+        let answer = ''
+        do {
+            answer = await rl.question(`*** Koffi ${koffiLatest} is available on npm, continue with ${koffiVersion} anyway (Y/N)? `) || 'n'
+        } while (!/^[yYnN]$/.test(answer))
+        rl.close()
 
-    // Get the main package's package.json.
-    const mainManifest: PackageJson = await json.fromFile(path.join(MAIN_PACKAGE, 'package.json'))
+        if (answer[0] === 'n' || answer[0] === 'N')
+            throw new Error('Aborted')
+    }
 
     // Do we need to update?
-    if (semver.gt(koffiVersion, mainManifest.version)) {
+    const repoManifest: PackageJson = await json.fromFile('package.json')
+    if (semver.lte(koffiVersion, repoManifest.version))
+        console.info("No need to update.")
+    else {
 
         // Package each koffi build we support as an optional dependency to our main package.
         // This involves:
@@ -80,7 +91,7 @@ try {
             console.info(`${koffiBuild} => ${cream}`)
 
             // Make sure we have a package for this build.
-            const pkgBase = path.join(CREAM_PACKAGES_BASE, cream)
+            const pkgBase = path.join(CREAM_PACKAGES, cream)
             if (!await fs.stat(pkgBase).then(stat => stat.isDirectory()).catch(() => false))
                 throw new Error(`Unsupported Koffi build ${koffiBuild}`)
 
@@ -89,7 +100,7 @@ try {
             await fs.copyFile(path.join(koffiBase, 'build', 'koffi', koffiBuild, 'koffi.node'), binary)
 
             // Update the package's package.json.
-            const [ platform, arch, libc ] = cream.split('-')
+            const [ platform, arch, libc ] = cream.split('-') as [ string, string, string | undefined ]
             const pkgManifest: PackageJson = await json.fromFile(path.join(pkgBase, 'package.json'))
             pkgManifest.name = `@septh/koffi-${cream}`
             pkgManifest.version = koffiVersion
@@ -97,8 +108,6 @@ try {
             pkgManifest.cpu = [ arch ]
             if (libc)
                 pkgManifest.libc = [ libc ]
-            else
-                delete pkgManifest.libc
             await json.write(pkgManifest)
 
             // Remember this dependency and binary.
@@ -108,33 +117,45 @@ try {
         console.groupEnd()
 
         // Update our main package:
-        // - update index.d.ts
-        // - update package.json
+        // - update version and optionalDependencies in package.json
+        // - copy index.d.ts from Koffi
         console.info('Updating main package...')
-        const typings = await fs.readFile(path.join(koffiBase, 'index.d.ts'))
-            .then(buf => buf.toString())
-            .then(str => str.replace("declare module 'koffi'", "declare module 'koffi-cream'"))
-        await fs.writeFile(path.join(MAIN_PACKAGE, 'index.d.ts'), typings)
-
+        const mainManifest: PackageJson = await json.fromFile(path.join(MAIN_PACKAGE, 'package.json'))
         mainManifest.version = koffiVersion
         mainManifest.optionalDependencies = packages
         await json.write(mainManifest)
 
-        // And now, publish'em all!
-        console.info('Publishing all packages with npm...')
-        await spawn('npm', [ 'publish', '--workspaces', '--access=public',
-            // '--registry=http://localhost:4873/',    // I use Verdaccio (https://www.verdaccio.org) for local tests
-            // '--dry-run'
-        ], { stdio: 'inherit' })
+        const typings = await fs.readFile(path.join(koffiBase, 'index.d.ts'))
+            .then(buf => buf.toString())
+            .then(str => str.replace("declare module 'koffi'", "declare module 'koffi-cream'"))
+        await fs.writeFile(path.join(MAIN_PACKAGE, mainManifest.types), typings)
 
-        // Update the repo
-        console.info('Cleaning up the repo...')
-        await Promise.all(binaries.map(bin => fs.rm(bin)))
-        await spawn('git', [ 'checkout', 'packages' ])
-        await spawn('git', [ 'commit', '-a', '-m', `Update to Koffi ${koffiVersion}` ])
-        await spawn('git', [ 'tag', `v${koffiVersion}`])
+        // And now, publish'em all!
+        let success = false
+        try {
+            console.info('Publishing all packages with npm...')
+            await spawn('npm', [ 'publish', '--workspaces', '--access=public',
+                // '--registry=http://localhost:4873/',    // I use Verdaccio (https://www.verdaccio.org) for local tests
+                // '--dry-run'
+            ], { stdio: 'inherit' })
+
+            success = true
+        }
+        finally {
+            console.info('Cleaning up...')
+            await Promise.all(binaries.map(bin => fs.rm(bin)))
+            await spawn('git', [ 'checkout', 'packages' ])
+
+            // Update the repo
+            if (success) {
+                repoManifest.version = koffiVersion
+                await json.write(repoManifest)
+
+                await spawn('git', [ 'commit', '-a', '-m', `Update to Koffi ${koffiVersion}` ])
+                await spawn('git', [ 'tag', `v${koffiVersion}`])
+            }
+        }
     }
-    else console.info("No need to update.")
 }
 catch(e) {
     const msg = e instanceof Error ? e.message : String(e)
