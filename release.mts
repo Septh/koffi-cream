@@ -47,10 +47,6 @@ try {
     if (process.cwd() !== import.meta.dirname)
         throw new Error(`Please run ${path.basename(import.meta.filename)} from the root of the monorepo.`)
 
-    // Define some paths.
-    const CREAM_PACKAGES = path.resolve('packages', '@koffi')       // Where individual packages are stored
-    const MAIN_PACKAGE   = path.resolve('packages', 'koffi-cream')  // Where our main cream package is stored
-
     // Get the version of Koffi currently installed in the repo.
     const koffiBase = fileURLToPath(new URL('./', import.meta.resolve('koffi')))
     const { version: koffiVersion }: PackageJson = await json.fromFile(path.join(koffiBase, 'package.json'))
@@ -59,10 +55,10 @@ try {
         throw new Error('This script only supports Koffi 2.x')
 
     // Check the latest version of Koffi on npm.
-    console.info("Checking latest version of Koffi on npm registry...")
+    console.info("Checking latest version of Koffi on the npm registry...")
     const { stdout: koffiLatest } = await spawn('npm', [ 'view', 'koffi@latest', 'version' ])
     if (semver.gt(koffiLatest, koffiVersion)) {
-        const rl = readline.createInterface({ input: process.stdin, output: process.stderr, terminal: true })
+        const rl = readline.createInterface(process.stdin, process.stderr)
         let answer = ''
         do {
             answer = await rl.question(`*** Koffi ${koffiLatest} is available on npm, continue with ${koffiVersion} anyway (Y/N)? `) || 'n'
@@ -76,8 +72,10 @@ try {
     // Do we need to update?
     const repoManifest: PackageJson = await json.fromFile('package.json')
     if (semver.lte(koffiVersion, repoManifest.version))
-        console.info("No need to update.")
+        console.info("Nothing to update.")
     else {
+        const CREAM_PACKAGES = path.resolve('packages', '@koffi')       // Where individual packages are stored
+        const MAIN_PACKAGE   = path.resolve('packages', 'koffi-cream')  // Where our main cream package is stored
 
         // Package each koffi build we support as an optional dependency to our main package.
         // This involves:
@@ -85,11 +83,11 @@ try {
         // - updating the package's package.json `version`, `os`, `cpu` and `libc` fields
         // - updating the main package's package.json `version` and `optionalDependencies` fields
         console.group('Packaging...')
-        const updatedPackages: Record<string, string> = {}
+        const supportedPackages: Record<string, string> = {}
         const copiedBinaries: string[] = []
         for (const koffiBuild in koffiToCream) {
             const cream = koffiToCream[koffiBuild]
-            console.info(`${koffiBuild} => ${cream}`)
+            process.stdout.write(`${koffiBuild} => ${cream}...`)
 
             // Make sure we have a package for this build and read its manifest.
             const pkgBase = path.join(CREAM_PACKAGES, cream)
@@ -112,8 +110,10 @@ try {
             await json.write(pkgManifest)
 
             // Remember this dependency and binary.
-            updatedPackages[pkgManifest.name] = pkgManifest.version
+            supportedPackages[pkgManifest.name] = pkgManifest.version
             copiedBinaries.push(destinationBinary)
+
+            console.log('ok')
         }
         console.groupEnd()
 
@@ -123,7 +123,7 @@ try {
         console.info('Updating main package...')
         const mainManifest: PackageJson = await json.fromFile(path.join(MAIN_PACKAGE, 'package.json'))
         mainManifest.version = koffiVersion
-        mainManifest.optionalDependencies = updatedPackages
+        mainManifest.optionalDependencies = supportedPackages
         await json.write(mainManifest)
 
         const typings = await fs.readFile(path.join(koffiBase, 'index.d.ts'))
@@ -157,12 +157,10 @@ try {
             }
         }
     }
+    console.info('Done')
 }
 catch(e) {
     const msg = e instanceof Error ? e.message : String(e)
     console.error(msg)
     process.exitCode = 1
-}
-finally {
-    console.info('Done')
 }

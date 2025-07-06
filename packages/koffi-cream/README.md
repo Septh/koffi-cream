@@ -1,4 +1,4 @@
-# Koffi-Cream
+# koffi-cream
 A lighter packaging of Niels Martignène's excellent [Koffi](https://koffi.dev).
 
 Just `npm install koffi-cream` instead of `koffi` and use it like the real thing:

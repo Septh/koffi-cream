@@ -14,9 +14,9 @@
             "cwd": "${workspaceFolder}",
             "program": "release.mts",
             "args": [],
+            "console": "integratedTerminal",
             "outputCapture": "std",
-            "console": "internalConsole",
-            "internalConsoleOptions": "openOnSessionStart",
+            "internalConsoleOptions": "neverOpen",
             "skipFiles": [
                 "<node_internals>/**",
                 "**/node_modules/**"
