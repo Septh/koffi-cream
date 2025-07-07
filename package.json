@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "koffi-cream-monorepo",
-  "version": "2.12.0",
+  "version": "2.12.1",
   "author": "Stephan 'Septh' Schreiber <septh@sfr.fr> (https://github.com/Septh)",
   "license": "MIT",
   "scripts": {
@@ -15,7 +15,7 @@
     "@septh/ts-run": "^2.0.0",
     "@types/node": "^22.14.1",
     "@types/semver": "^7.7.0",
-    "koffi": "2.12.0",
+    "koffi": "2.12.1",
     "magic-json": "^1.0.0",
     "nano-spawn": "^1.0.1",
     "semver": "^7.7.1"
