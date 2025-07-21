@@ -24,12 +24,12 @@ const { platform, arch } = require('node:process')
 const { deprecate } = require('node:util')
 
 let native
-if (platform === 'linux' && arch === 'x64') {
+if (platform === 'linux' && (arch === 'x64' || arch === 'arm64')) {
     try {
-        native = require(`@septh/koffi-linux-x64-glibc`)
+        native = require(`@septh/koffi-linux-${arch}-glibc`)
     }
     catch {
-        native = require(`@septh/koffi-linux-x64-musl`)
+        native = require(`@septh/koffi-linux-${arch}-musl`)
     }
 }
 else native = require(`@septh/koffi-${platform}-${arch}`)

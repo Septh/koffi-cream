@@ -1,6 +1,6 @@
 {
-  "name": "@septh/koffi-linux-arm64",
-  "version": "0.0.1",
+  "name": "@septh/koffi-linux-arm64-glibc",
+  "version": "2.12.2",
   "description": "The Linux ARM 64-bit binary for Koffi, a fast and simple C FFI (foreign function interface) for Node.js",
   "author": {
     "name": "Stephan 'Septh' Schreiber",
@@ -24,7 +24,8 @@
     "napi",
     "koffi",
     "linux",
-    "arm64"
+    "arm64",
+    "gnu"
   ],
   "license": "MIT",
   "repository": {
