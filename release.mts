@@ -49,7 +49,7 @@ try {
 
     // Get the version of Koffi currently installed in the repo.
     const koffiBase = fileURLToPath(new URL('./', import.meta.resolve('koffi')))
-    const { version: koffiVersion }: PackageJson = await json.fromFile(path.join(koffiBase, 'package.json'))
+    const { version: koffiVersion } = await json.fromFile<PackageJson>(path.join(koffiBase, 'package.json'))
     console.info(`Koffi version ${koffiVersion} found at ${koffiBase}`)
     if (semver.major(koffiVersion) !== 2)
         throw new Error('This script only supports Koffi 2.x')
@@ -70,7 +70,7 @@ try {
     }
 
     // Do we need to update?
-    const repoManifest: PackageJson = await json.fromFile('package.json')
+    const repoManifest = await json.fromFile<PackageJson>('package.json')
     if (semver.lte(koffiVersion, repoManifest.version))
         console.info("Nothing to update.")
     else {
@@ -93,7 +93,7 @@ try {
             const pkgBase = path.join(CREAM_PACKAGES, cream)
             if (!await fs.stat(pkgBase).then(stat => stat.isDirectory()).catch(() => false))
                 throw new Error(`Unsupported Koffi build ${koffiBuild}`)
-            const pkgManifest: PackageJson = await json.fromFile(path.join(pkgBase, 'package.json'))
+            const pkgManifest = await json.fromFile<PackageJson>(path.join(pkgBase, 'package.json'))
 
             // Copy the big binary.
             const destinationBinary = path.join(pkgBase, pkgManifest.main)
@@ -121,7 +121,7 @@ try {
         // - update version and optionalDependencies in package.json
         // - copy index.d.ts from Koffi
         console.info('Updating main package...')
-        const mainManifest: PackageJson = await json.fromFile(path.join(MAIN_PACKAGE, 'package.json'))
+        const mainManifest = await json.fromFile<PackageJson>(path.join(MAIN_PACKAGE, 'package.json'))
         mainManifest.version = koffiVersion
         mainManifest.optionalDependencies = supportedPackages
         await json.write(mainManifest)
