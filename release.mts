@@ -40,6 +40,8 @@ const koffiToCream: Record<string, string> = {
 }
 
 try {
+    const DEBUG = !!process.env['DEBUG']
+
     // Check availability of `import.meta.dirname` and `import.meta.resolve`.
     if (!semver.satisfies(process.versions.node, '^20.11.0 || >= 22'))
         throw new Error('This script requires Node.js 20.11.0+ or 22+')
@@ -129,7 +131,7 @@ try {
 
         const typings = await fs.readFile(path.join(koffiBase, 'index.d.ts'))
             .then(buf => buf.toString())
-            .then(str => str.replace("declare module 'koffi'", "declare module 'koffi-cream'"))
+            .then(str => str.replace("declare module 'koffi'", "declare module 'koffi-cream'"))     // Note: no longer necessary since Koffi 2.12.3
         await fs.writeFile(path.join(MAIN_PACKAGE, mainManifest.types), typings)
 
         // And now, publish'em all!
@@ -137,8 +139,8 @@ try {
         try {
             console.info('Publishing all packages with npm...')
             await spawn('npm', [ 'publish', '--workspaces', '--access=public',
-                // '--dry-run'
-            ], { stdio: 'inherit' })
+                DEBUG ? '--dry-run' : ''
+            ].filter(Boolean), { stdio: 'inherit' })
 
             success = true
         }
@@ -148,7 +150,7 @@ try {
             await spawn('git', [ 'checkout', 'packages' ])
 
             // Update the repo
-            if (success) {
+            if (success && !DEBUG) {
                 repoManifest.version = koffiVersion
                 await json.write(repoManifest)
 
