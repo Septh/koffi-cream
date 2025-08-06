@@ -26,17 +26,17 @@ interface PackageJson {
 const koffiToCream: Record<string, string> = {
     darwin_arm64:   'darwin-arm64',
     darwin_x64:     'darwin-x64',
-    linux_arm64:    'linux-arm64-glibc',
-    musl_arm64:     'linux-arm64-musl',
-    linux_x64:      'linux-x64-glibc',
-    musl_x64:       'linux-x64-musl',
-    linux_loong64:  'linux-loong64',
-    linux_riscv64d: 'linux-riscv64',
-    win32_arm64:    'win32-arm64',
-    win32_x64:      'win32-x64',
     freebsd_arm64:  'freebsd-arm64',
     freebsd_x64:    'freebsd-x64',
+    linux_arm64:    'linux-arm64-glibc',
+    linux_loong64:  'linux-loong64',
+    linux_riscv64d: 'linux-riscv64',
+    linux_x64:      'linux-x64-glibc',
+    musl_arm64:     'linux-arm64-musl',
+    musl_x64:       'linux-x64-musl',
     openbsd_x64:    'openbsd-x64',
+    win32_arm64:    'win32-arm64',
+    win32_x64:      'win32-x64',
 }
 
 try {
@@ -44,27 +44,29 @@ try {
 
     // Check availability of `import.meta.dirname` and `import.meta.resolve`.
     if (!semver.satisfies(process.versions.node, '^20.11.0 || >= 22'))
-        throw new Error('This script requires Node.js 20.11.0+ or 22+')
+        throw new Error('This script requires NodeJS 20 (20.11.0+) or 22+')
 
     // Ensure the script is run from the root of the monorepo.
-    if (process.cwd() !== import.meta.dirname)
-        throw new Error(`Please run ${path.basename(import.meta.filename)} from the root of the monorepo.`)
+    process.chdir(import.meta.dirname)
 
     // Get the version of Koffi currently installed in the repo.
     const koffiBase = fileURLToPath(new URL('./', import.meta.resolve('koffi')))
-    const { version: koffiVersion } = await json.fromFile<PackageJson>(path.join(koffiBase, 'package.json'))
-    console.info(`Koffi version ${koffiVersion} found at ${koffiBase}`)
-    if (semver.major(koffiVersion) !== 2)
+    const koffiManifest = await json.fromFile<PackageJson>(path.join(koffiBase, 'package.json'))
+    if (typeof koffiManifest.version !== 'string' || typeof koffiManifest.types !== 'string')
+        throw new Error('Something is wrong in koffi/package.json')
+
+    console.info(`Koffi version ${koffiManifest.version} found at ${koffiBase}`)
+    if (semver.major(koffiManifest.version) !== 2)
         throw new Error('This script only supports Koffi 2.x')
 
     // Check the latest version of Koffi on npm.
     console.info("Checking latest version of Koffi on the npm registry...")
     const { stdout: koffiLatest } = await spawn('npm', [ 'view', 'koffi@latest', 'version' ])
-    if (semver.gt(koffiLatest, koffiVersion)) {
+    if (semver.gt(koffiLatest, koffiManifest.version)) {
         const rl = readline.createInterface(process.stdin, process.stderr)
         let answer = ''
         do {
-            answer = await rl.question(`*** Koffi ${koffiLatest} is available on npm, continue with ${koffiVersion} anyway (Y/N)? `) || 'n'
+            answer = await rl.question(`*** Koffi ${koffiLatest} is available on npm, continue with ${koffiManifest.version} anyway (Y/N)? `) || 'n'
         } while (!/^[yYnN]$/.test(answer))
         rl.close()
 
@@ -74,11 +76,11 @@ try {
 
     // Do we need to update?
     const repoManifest = await json.fromFile<PackageJson>('package.json')
-    if (semver.lte(koffiVersion, repoManifest.version))
+    if (semver.lte(koffiManifest.version, repoManifest.version))
         console.info("Nothing to update.")
     else {
         const CREAM_PACKAGES = path.resolve('packages', '@koffi')       // Where individual packages are stored
-        const MAIN_PACKAGE   = path.resolve('packages', 'koffi-cream')  // Where our main cream package is stored
+        const MAIN_PACKAGE   = path.resolve('packages', 'koffi-cream')  // Where our main package is stored
 
         // Package each koffi build we support as an optional dependency to our main package.
         // This involves:
@@ -105,7 +107,7 @@ try {
             // Update the package's package.json.
             const [ platform, arch, libc ] = cream.split('-') as [ string, string, string | undefined ]
             pkgManifest.name = `@septh/koffi-${cream}`
-            pkgManifest.version = koffiVersion
+            pkgManifest.version = koffiManifest.version
             pkgManifest.os = [ platform ]
             pkgManifest.cpu = [ arch ]
             if (libc)
@@ -125,21 +127,23 @@ try {
         // - copy index.d.ts from Koffi
         console.info('Updating main package...')
         const mainManifest = await json.fromFile<PackageJson>(path.join(MAIN_PACKAGE, 'package.json'))
-        mainManifest.version = koffiVersion
+        mainManifest.version = koffiManifest.version
         mainManifest.optionalDependencies = supportedPackages
         await json.write(mainManifest)
 
-        const typings = await fs.readFile(path.join(koffiBase, 'index.d.ts'))
+        // Patch and write the typings (index.d.ts) in case they were updated.
+        // (patching is no longer necessary since Koffi 2.12.3 (https://github.com/Koromix/rygel/pull/89), but leaving as is anyway)
+        const typings = await fs.readFile(path.join(koffiBase, koffiManifest.types))
             .then(buf => buf.toString())
-            .then(str => str.replace("declare module 'koffi'", "declare module 'koffi-cream'"))     // Note: no longer necessary since Koffi 2.12.3
+            .then(str => str.replace(/declare module (["'])koffi\1/, "declare module $1koffi-cream$1"))
         await fs.writeFile(path.join(MAIN_PACKAGE, mainManifest.types), typings)
 
         // And now, publish'em all!
         let success = false
         try {
             console.info('Publishing all packages with npm...')
-            await spawn('npm', [ 'publish', '--workspaces', '--access=public',
-                DEBUG ? '--dry-run' : ''
+            await spawn('npm', [
+                'publish', '--workspaces', '--access=public', DEBUG ? '--dry-run' : ''
             ].filter(Boolean), { stdio: 'inherit' })
 
             success = true
@@ -149,13 +153,16 @@ try {
             await Promise.all(copiedBinaries.map(bin => fs.rm(bin)))
             await spawn('git', [ 'checkout', 'packages' ])
 
-            // Update the repo
             if (success && !DEBUG) {
-                repoManifest.version = koffiVersion
+                console.info('Updating the repo...')
+                repoManifest.version = koffiManifest.version
                 await json.write(repoManifest)
+                await spawn('git', [ 'commit', '-a', '-m', `Update to Koffi ${koffiManifest.version}` ])
 
-                await spawn('git', [ 'commit', '-a', '-m', `Update to Koffi ${koffiVersion}` ])
-                await spawn('git', [ 'tag', `v${koffiVersion}`])
+                const tag = `v${koffiManifest.version}`
+                console.info('Creating and pushing tag', tag)
+                await spawn('git', [ 'tag', tag ])
+                await spawn('git', [ 'push', '--atomic', 'origin', 'main', tag ])
             }
         }
     }
