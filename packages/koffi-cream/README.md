@@ -24,7 +24,7 @@ This way, when you install `koffi-cream`, your package manager will only downloa
 - `koffi-cream` (this package): 5.1 kB compressed / 19.8 kB uncompressed
 - `@septh/koffi-win32-x64`: 536.2 kB compressed / 2.4 MB uncompressed
 
-**That's 97.2% off compared to the original Koffi package!**
+**That's 74.2% off compared to the original Koffi package!**
 
 > [!NOTE]
 > The `os` and `cpu` are standard properties, supported by all package managers. But the `libc` property, used to distinguish Linux distros between gnu and musl, is newer and only supported by `npm 10.4.0` and later, `pnpm 7.1.0` and later, and `yarn 3.2.0` and later.
