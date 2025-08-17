@@ -12,7 +12,7 @@ const some_func = lib.func('int some_func(int a, int b)')
 ```
 
 > [!IMPORTANT]
-> **This package is neither a fork nor a patch. It *is* the original Koffi**, only packaged differently to avoid downloading a megalithic[^1] package bloated with unnecessary files[^2].
+> **This package is neither a fork nor a patch. It *is* the original Koffi**, only packaged differently to avoid downloading a megalithic[^1] package bloated with files unnecessary to the average user[^2].
 
 
 ## The why and the how
@@ -21,20 +21,20 @@ The discussion at https://github.com/Koromix/koffi/issues/201 explains why I dec
 `koffi-cream` repackages Koffi using the same strategy as many popular packages in the JavaScript community like `esbuild` or `swc`: by leveraging the `optionalDependencies`, `os`, `cpu` and `libc` properties in `package.json`.
 
 This way, when you install `koffi-cream`, your package manager will only download and install the build that is right for your platform. For example, on Windows AMD/Intel 64 bit, your package manager will install:
-- `koffi-cream` (this package): 3.4 kB compressed / 12.8 kB uncompressed
-- `@septh/koffi-win32-x64`: 455 kB compressed / 2.3 MB uncompressed
+- `koffi-cream` (this package): 5.1 kB compressed / 19.8 kB uncompressed
+- `@septh/koffi-win32-x64`: 536.2 kB compressed / 2.4 MB uncompressed
 
-**That's 97% off compared to the original Koffi package!**
+**That's 97.2% off compared to the original Koffi package!**
 
 > [!NOTE]
 > The `os` and `cpu` are standard properties, supported by all package managers. But the `libc` property, used to distinguish Linux distros between gnu and musl, is newer and only supported by `npm 10.4.0` and later, `pnpm 7.1.0` and later, and `yarn 3.2.0` and later.
 
-[^1]: As of 2.11.0, Koffi weights 15 MB compressed and 75 MB uncompressed!
-[^2]: Koffi's package includes 17 natives binaries (of which 16 are not compatible with your platform), the build tools and the full source code!
+[^1]: As of 2.14.0, Koffi weights 16.9 MB compressed and 86 MB uncompressed.
+[^2]: Koffi's package includes 18 natives binaries (of which 17 are not compatible with your platform), the build tools and the full source code.
 
 
 ## Available packages
-`koffi-cream` only offers a subset of Koffi's 17 native builds:
+`koffi-cream` only offers a subset of Koffi's 18 native builds:
 
 | Koffi binary  | koffi-cream package                                                                        |
 |---------------|--------------------------------------------------------------------------------------------|
@@ -43,12 +43,13 @@ This way, when you install `koffi-cream`, your package manager will only downloa
 | freebsd-arm64 | [@septh/koffi-freebsd-arm64](https://www.npmjs.com/package/@septh/koffi-freebsd-arm64)     |
 | freebsd-ia32  | ❌                                                                                        |
 | freebsd-x64   | [@septh/koffi-freebsd-x64](https://www.npmjs.com/package/@septh/koffi-freebsd-x64)         |
-| linux-arm64   | [@septh/koffi-linux-arm64](https://www.npmjs.com/package/@septh/koffi-linux-arm64)         |
+| linux-arm64   | [@septh/koffi-linux-arm64-glibc](https://www.npmjs.com/package/@septh/koffi-linux-arm64)   |
 | linux-armhf   | ❌                                                                                        |
 | linux-ia32    | ❌                                                                                        |
 | linux-loong64 | [@septh/koffi-linux-loong64](https://www.npmjs.com/package/@septh/koffi-linux-loong64)     |
 | linux-riscv64 | [@septh/koffi-linux-riscv64](https://www.npmjs.com/package/@septh/koffi-linux-riscv64)     |
 | linux-x64     | [@septh/koffi-linux-x64-glibc](https://www.npmjs.com/package/@septh/koffi-linux-x64-glibc) |
+| musl-arm64    | [@septh/koffi-linux-arm64-musl](https://www.npmjs.com/package/@septh/koffi-linux-arm64)    |
 | musl-x64      | [@septh/koffi-linux-x64-musl](https://www.npmjs.com/package/@septh/koffi-linux-x64-musl)   |
 | openbsd-ia32  | ❌                                                                                        |
 | openbsd-x64   | [@septh/koffi-openbsd-x64](https://www.npmjs.com/package/@septh/koffi-openbsd-x64)         |
