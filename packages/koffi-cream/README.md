@@ -14,6 +14,9 @@ const some_func = lib.func('int some_func(int a, int b)')
 > [!IMPORTANT]
 > **This package is neither a fork nor a patch. It *is* the original Koffi**, only packaged differently to avoid downloading a megalithic[^1] package bloated with files unnecessary to the average user[^2].
 
+[^1]: As of 2.14.0, Koffi weights 16.9 MB compressed and 86 MB uncompressed.
+[^2]: Koffi's package includes 18 natives binaries (of which 17 are not compatible with your platform), the build tools and the full source code.
+
 
 ## The why and the how
 The discussion at https://github.com/Koromix/koffi/issues/201 explains why I decided to create `koffi-cream`.
@@ -28,9 +31,6 @@ This way, when you install `koffi-cream`, your package manager will only downloa
 
 > [!NOTE]
 > The `os` and `cpu` are standard properties, supported by all package managers. But the `libc` property, used to distinguish Linux distros between gnu and musl, is newer and only supported by `npm 10.4.0` and later, `pnpm 7.1.0` and later, and `yarn 3.2.0` and later.
-
-[^1]: As of 2.14.0, Koffi weights 16.9 MB compressed and 86 MB uncompressed.
-[^2]: Koffi's package includes 18 natives binaries (of which 17 are not compatible with your platform), the build tools and the full source code.
 
 
 ## Available packages
