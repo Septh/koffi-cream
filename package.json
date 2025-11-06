@@ -17,7 +17,7 @@
     "@types/semver": "^7.7.0",
     "koffi": "^2.11.0",
     "magic-json": "^1.1.4",
-    "nano-spawn": "^1.0.1",
+    "nano-spawn": "^2.0.0",
     "semver": "^7.7.1"
   }
 }
