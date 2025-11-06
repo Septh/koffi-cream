@@ -96,8 +96,10 @@ try {
 
             // Make sure we have a package for this build and read its manifest.
             const pkgBase = path.join(CREAM_PACKAGES, cream)
-            if (!await fs.stat(pkgBase).then(stat => stat.isDirectory()).catch(() => false))
+            if (!await fs.stat(pkgBase).then(stat => stat.isDirectory()).catch(() => false)) {
+                console.groupEnd()
                 throw new Error(`Unsupported Koffi build ${koffiBuild}`)
+            }
             const pkgManifest = await json.fromFile<PackageJson>(path.join(pkgBase, 'package.json'))
 
             // Copy the big binary.
@@ -110,8 +112,7 @@ try {
             pkgManifest.version = koffiManifest.version
             pkgManifest.os = [ platform ]
             pkgManifest.cpu = [ arch ]
-            if (libc)
-                pkgManifest.libc = [ libc ]
+            pkgManifest.libc = libc ? [ libc ] : undefined
             await json.write(pkgManifest)
 
             // Remember this dependency and binary.
