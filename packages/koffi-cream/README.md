@@ -1,5 +1,5 @@
 # koffi-cream
-A lighter packaging of Niels Martignène's excellent [Koffi](https://koffi.dev).
+A lighter repackaging of Niels Martignène's excellent [Koffi](https://koffi.dev).
 
 Just `npm install koffi-cream` instead of `koffi` and use it like the real thing:
 
@@ -12,10 +12,10 @@ const some_func = lib.func('int some_func(int a, int b)')
 ```
 
 > [!IMPORTANT]
-> **This package is neither a fork nor a patch. It *is* the original Koffi**, only packaged differently to avoid downloading a megalithic[^1] package bloated with files unnecessary to the average user[^2].
+> **koffi-cream is neither a fork nor a patch. It *is* the original Koffi**, only packaged differently to avoid downloading a megalithic[^1] package bloated with files unnecessary to the average user[^2].
 
 [^1]: As of 2.14.0, Koffi weights 16.9 MB compressed and 86 MB uncompressed.
-[^2]: Koffi's package includes 18 natives binaries (of which 17 are not compatible with your platform), the build tools and the full source code.
+[^2]: Koffi's package includes 18 native binaries (of which 17 are not compatible with your platform), the build tools and the full source code.
 
 
 ## The why and the how
@@ -30,11 +30,11 @@ This way, when you install `koffi-cream`, your package manager will only downloa
 **That's 74.2% off compared to the original Koffi package!**
 
 > [!NOTE]
-> The `os` and `cpu` are standard properties, supported by all package managers. But the `libc` property, used to distinguish Linux distros between gnu and musl, is newer and only supported by `npm 10.4.0` and later, `pnpm 7.1.0` and later, and `yarn 3.2.0` and later.
+> The `libc` property, used to distinguish Linux distros between gnu and musl, is only supported by `npm 10.4.0` and later, `pnpm 7.1.0` and later, and `yarn 3.2.0` and later.
 
 
 ## Available packages
-`koffi-cream` only offers a subset of Koffi's 18 native builds:
+`koffi-cream` purposely only offers a subset of Koffi's 18 native builds:
 
 | Koffi binary  | koffi-cream package                                                                        |
 |---------------|--------------------------------------------------------------------------------------------|
@@ -57,13 +57,13 @@ This way, when you install `koffi-cream`, your package manager will only downloa
 | win32-ia32    | ❌                                                                                        |
 | win32-x64     | [@septh/koffi-win32-x64](https://www.npmjs.com/package/@septh/koffi-win32-x64)             |
 
-I do not plan to add the missing builds. If you need one of these, you'll have to stick with Koffi.
+I do not plan to add the other builds. If you need one of these, you'll have to stick with Koffi.
 
 
 ## Version numbering
 To make things easy on the user, `koffi-cream`'s version number will always be aligned with Koffi's.
 
-Hence, there is no `koffi-cream` 1.x or 2.0; the first version published is 2.11.0 which ships with Koffi's 2.11.0 binaries.
+Hence, there is no `koffi-cream` 1.x or 2.0; the first version published is 2.11.0 which ships with Koffi 2.11.0 binaries.
 
 
 ## Related
