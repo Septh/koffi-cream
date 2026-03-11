@@ -1,25 +1,13 @@
-// Copyright (C) 2025  Niels Martignène <niels.martignene@protonmail.com>
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy of
-// this software and associated documentation files (the “Software”), to deal in
-// the Software without restriction, including without limitation the rights to use,
-// copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the
-// Software, and to permit persons to whom the Software is furnished to do so,
-// subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND,
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-// HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-// WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-// OTHER DEALINGS IN THE SOFTWARE.
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2025 Niels Martignène <niels.martignene@protonmail.com>
 
-export function load(path: string | null): IKoffiLib;
+type LoadOptions = {
+    lazy?: boolean,
+    global?: boolean,
+    deep?: boolean
+};
+
+export function load(path: string | null, options?: LoadOptions): IKoffiLib;
 
 interface IKoffiCType { __brand: 'IKoffiCType' }
 interface IKoffiPointerCast { __brand: 'IKoffiPointerCast' }
@@ -65,31 +53,31 @@ export type KoffiFunc<T extends (...args: any) => any> = T & {
 
 export interface IKoffiLib {
     func(definition: string): KoffiFunction;
-    func(name: string, result: TypeSpec, arguments: TypeSpec[]): KoffiFunction;
-    func(convention: string, name: string, result: TypeSpec, arguments: TypeSpec[]): KoffiFunction;
+    func(name: string | number, result: TypeSpec, arguments: TypeSpec[]): KoffiFunction;
+    func(convention: string, name: string | number, result: TypeSpec, arguments: TypeSpec[]): KoffiFunction;
 
     /** @deprecated */ cdecl(definition: string): KoffiFunction;
-    /** @deprecated */ cdecl(name: string, result: TypeSpec, arguments: TypeSpec[]): KoffiFunction;
+    /** @deprecated */ cdecl(name: string | number, result: TypeSpec, arguments: TypeSpec[]): KoffiFunction;
     /** @deprecated */ stdcall(definition: string): KoffiFunction;
-    /** @deprecated */ stdcall(name: string, result: TypeSpec, arguments: TypeSpec[]): KoffiFunction;
+    /** @deprecated */ stdcall(name: string | number, result: TypeSpec, arguments: TypeSpec[]): KoffiFunction;
     /** @deprecated */ fastcall(definition: string): KoffiFunction;
-    /** @deprecated */ fastcall(name: string, result: TypeSpec, arguments: TypeSpec[]): KoffiFunction;
+    /** @deprecated */ fastcall(name: string | number, result: TypeSpec, arguments: TypeSpec[]): KoffiFunction;
     /** @deprecated */ thiscall(definition: string): KoffiFunction;
-    /** @deprecated */ thiscall(name: string, result: TypeSpec, arguments: TypeSpec[]): KoffiFunction;
+    /** @deprecated */ thiscall(name: string | number, result: TypeSpec, arguments: TypeSpec[]): KoffiFunction;
 
     symbol(name: string, type: TypeSpec): any;
 
     unload(): void;
 }
 
-export function struct(name: string, def: Record<string, TypeSpecWithAlignment>): IKoffiCType;
+export function struct(name: string | null | undefined, def: Record<string, TypeSpecWithAlignment>): IKoffiCType;
 export function struct(ref: IKoffiCType, def: Record<string, TypeSpecWithAlignment>): IKoffiCType;
 export function struct(def: Record<string, TypeSpecWithAlignment>): IKoffiCType;
-export function pack(name: string, def: Record<string, TypeSpecWithAlignment>): IKoffiCType;
+export function pack(name: string | null | undefined, def: Record<string, TypeSpecWithAlignment>): IKoffiCType;
 export function pack(ref: IKoffiCType, def: Record<string, TypeSpecWithAlignment>): IKoffiCType;
 export function pack(def: Record<string, TypeSpecWithAlignment>): IKoffiCType;
 
-export function union(name: string, def: Record<string, TypeSpecWithAlignment>): IKoffiCType;
+export function union(name: string | null | undefined, def: Record<string, TypeSpecWithAlignment>): IKoffiCType;
 export function union(ref: IKoffiCType, def: Record<string, TypeSpecWithAlignment>): IKoffiCType;
 export function union(def: Record<string, TypeSpecWithAlignment>): IKoffiCType;
 
@@ -99,29 +87,36 @@ export class Union {
 }
 
 export function array(ref: TypeSpec, len: number, hint?: ArrayHint | null): IKoffiCType;
+export function array(ref: TypeSpec, countedBy: string, maxLen: number, hint?: ArrayHint | null): IKoffiCType;
 
-export function opaque(name: string): IKoffiCType;
+export function opaque(name: string | null | undefined): IKoffiCType;
 export function opaque(): IKoffiCType;
-/** @deprecated */ export function handle(name: string): IKoffiCType;
+/** @deprecated */ export function handle(name: string | null | undefined): IKoffiCType;
 /** @deprecated */ export function handle(): IKoffiCType;
 
 export function pointer(ref: TypeSpec): IKoffiCType;
-export function pointer(ref: TypeSpec, asteriskCount?: number): IKoffiCType;
-export function pointer(name: string, ref: TypeSpec, asteriskCount?: number): IKoffiCType;
+export function pointer(ref: TypeSpec, count: number): IKoffiCType;
+export function pointer(name: string | null | undefined, ref: TypeSpec, countedBy?: string | null): IKoffiCType;
+export function pointer(name: string | null | undefined, ref: TypeSpec, count: number): IKoffiCType;
 
 export function out(type: TypeSpec): IKoffiCType;
 export function inout(type: TypeSpec): IKoffiCType;
 
 export function disposable(type: TypeSpec): IKoffiCType;
-export function disposable(name: string, type: TypeSpec): IKoffiCType;
-export function disposable(name: string, type: TypeSpec, freeFunction: Function): IKoffiCType;
+export function disposable(type: TypeSpec, freeFunction: Function): IKoffiCType;
+export function disposable(name: string | null | undefined, type: TypeSpec): IKoffiCType;
+export function disposable(name: string | null | undefined, type: TypeSpec, freeFunction: Function): IKoffiCType;
 
 export function proto(definition: string): IKoffiCType;
-export function proto(name: string, result: TypeSpec, arguments: TypeSpec[]): IKoffiCType;
-export function proto(convention: string, name: string, result: TypeSpec, arguments: TypeSpec[]): IKoffiCType;
+export function proto(result: TypeSpec, arguments: TypeSpec[]): IKoffiCType;
+export function proto(convention: string, result: TypeSpec, arguments: TypeSpec[]): IKoffiCType;
+export function proto(name: string | null | undefined, result: TypeSpec, arguments: TypeSpec[]): IKoffiCType;
+export function proto(convention: string, name: string | null | undefined, result: TypeSpec, arguments: TypeSpec[]): IKoffiCType;
 /** @deprecated */ export function callback(definition: string): IKoffiCType;
-/** @deprecated */ export function callback(name: string, result: TypeSpec, arguments: TypeSpec[]): IKoffiCType;
-/** @deprecated */ export function callback(convention: string, name: string, result: TypeSpec, arguments: TypeSpec[]): IKoffiCType;
+/** @deprecated */ export function callback(result: TypeSpec, arguments: TypeSpec[]): IKoffiCType;
+/** @deprecated */ export function callback(convention: string, result: TypeSpec, arguments: TypeSpec[]): IKoffiCType;
+/** @deprecated */ export function callback(name: string | null | undefined, result: TypeSpec, arguments: TypeSpec[]): IKoffiCType;
+/** @deprecated */ export function callback(convention: string, name: string | null | undefined, result: TypeSpec, arguments: TypeSpec[]): IKoffiCType;
 
 export function register(callback: Function, type: TypeSpec): IKoffiRegisteredCallback;
 export function register(thisValue: any, callback: Function, type: TypeSpec): IKoffiRegisteredCallback;
@@ -149,9 +144,22 @@ export function introspect(type: TypeSpec): TypeInfo;
 
 export function alias(name: string, type: TypeSpec): IKoffiCType;
 
-export function config(): Record<string, unknown>;
-export function config(cfg: Record<string, unknown>): Record<string, unknown>;
-export function stats(): Record<string, unknown>;
+type KoffiConfig = {
+    sync_stack_size?: number
+    sync_heap_size?: number
+    async_stack_size?: number
+    async_heap_size?: number
+    resident_async_pools?: number
+    max_async_calls?: number
+    max_type_size?: number
+};
+type KoffiStats = {
+    disposed: number
+};
+
+export function config(): KoffiConfig;
+export function config(cfg: KoffiConfig): KoffiConfig;
+export function stats(): KoffiStats;
 
 export function alloc(type: TypeSpec, length: number): any;
 export function free(value: any): void;
@@ -248,5 +256,33 @@ type PrimitiveTypes =
     | 'ushort'
     | 'void'
     | 'wchar'
-    | 'wchar_t'
-export const types: Record<PrimitiveTypes, IKoffiCType>
+    | 'wchar_t';
+export const types: Record<PrimitiveTypes, IKoffiCType>;
+
+export interface IKoffiPollOptions {
+    readable?: boolean;
+    writable?: boolean;
+    disconnect?: boolean;
+}
+
+export interface IKoffiPollEvents {
+    readable: boolean;
+    writable: boolean;
+    disconnect: boolean;
+}
+
+export namespace node {
+    export const env: { __brand: 'IKoffiNodeEnv' };
+
+    export class PollHandle {
+        start(opts: IKoffiPollOptions, callback: (ev: IKoffiPollEvents) => void): void;
+        start(callback: (ev: IKoffiPollEvents) => void): void;
+        stop(): void;
+        close(): void;
+        unref(): void;
+        ref(): void;
+    }
+
+    export function poll(fd: number, opts: IKoffiPollOptions, callback: (ev: IKoffiPollEvents) => void): PollHandle;
+    export function poll(fd: number, callback: (ev: IKoffiPollEvents) => void): PollHandle;
+}
