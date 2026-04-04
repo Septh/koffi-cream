@@ -165,7 +165,7 @@ try {
                 const tag = `v${koffiManifest.version}`
                 console.info('Creating and pushing tag', tag)
                 await spawn('git', [ 'tag', tag ])
-                await spawn('git', [ 'push', '--atomic', 'origin', 'main', tag ])
+                await spawn('git', [ 'push', '--follow-tags' ])
             }
         }
     }
