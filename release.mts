@@ -156,9 +156,10 @@ try {
             await spawn('git', [ 'checkout', 'packages' ])
 
             if (success && !DEBUG) {
+                console.info('Bumping repo version...')
+                await spawn('npm', [ 'version', '--no-git-tag-version', koffiManifest.version ])
+
                 console.info('Updating the repo...')
-                repoManifest.version = koffiManifest.version
-                await json.write(repoManifest)
                 await spawn('git', [ 'commit', '-a', '-m', `Update to Koffi ${koffiManifest.version}` ])
 
                 const tag = `v${koffiManifest.version}`
