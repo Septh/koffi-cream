@@ -3,33 +3,22 @@
     "packages/**/*.js",
     "./release.mts"
   ],
-  "compilerOptions": {
-    "checkJs": true,
-    "resolveJsonModule": true,
-    "noEmit": true,
-
-    // Module
-    "module": "Node16",
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-
-    // Libs
+  "compilerOptions": {    // Environment
+    "module": "node20",
     "target": "ESNext",
     "lib": [ "ESNext" ],
-    "skipLibCheck": false,
-    "skipDefaultLibCheck": true,
+    "types": [ "node" ],
+
+    // Input
+    "resolveJsonModule": true,
+
+    // Output
+    "rewriteRelativeImportExtensions": true,
+    "noEmit": true,
 
     // Type checking
     "strict": true,
-    "exactOptionalPropertyTypes": false,
-    "noImplicitOverride": true,
-    "noImplicitReturns": true,
-    "noPropertyAccessFromIndexSignature": false,
-    "noUncheckedIndexedAccess": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noFallthroughCasesInSwitch": false,
-    "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true
+    "skipLibCheck": false,
+    "skipDefaultLibCheck": true
   }
 }

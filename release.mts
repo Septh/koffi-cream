@@ -23,7 +23,7 @@ interface PackageJson {
 }
 
 // This maps the various Koffi builds we support to our Cream packages.
-const koffiToCream: Record<string, string> = {
+const supportedBuilds: Record<string, string> = {
     darwin_arm64:   'darwin-arm64',
     darwin_x64:     'darwin-x64',
     freebsd_arm64:  'freebsd-arm64',
@@ -40,11 +40,12 @@ const koffiToCream: Record<string, string> = {
 }
 
 try {
+    debugger
     const DEBUG = !!process.env['DEBUG']
 
     // Check availability of `import.meta.dirname` and `import.meta.resolve`.
     if (!semver.satisfies(process.versions.node, '^20.11.0 || >= 22'))
-        throw new Error('This script requires NodeJS 20 (20.11.0+) or 22+')
+        throw new Error('This script requires NodeJS 20.11.0+ or 22+')
 
     // Ensure the script is run from the root of the monorepo.
     process.chdir(import.meta.dirname)
@@ -90,21 +91,21 @@ try {
         console.group('Packaging...')
         const supportedPackages: Record<string, string> = {}
         const copiedBinaries: string[] = []
-        for (const koffiBuild in koffiToCream) {
-            const cream = koffiToCream[koffiBuild]
-            process.stdout.write(`${koffiBuild} => ${cream}...`)
+        for (const build in supportedBuilds) {
+            const cream = supportedBuilds[build]
+            process.stdout.write(`${build} => ${cream}...`)
 
             // Make sure we have a package for this build and read its manifest.
             const pkgBase = path.join(CREAM_PACKAGES, cream)
             if (!await fs.stat(pkgBase).then(stat => stat.isDirectory()).catch(() => false)) {
                 console.groupEnd()
-                throw new Error(`Unsupported Koffi build ${koffiBuild}`)
+                throw new Error(`Unsupported Koffi build ${build}`)
             }
             const pkgManifest = await json.fromFile<PackageJson>(path.join(pkgBase, 'package.json'))
 
             // Copy the big binary.
             const destinationBinary = path.join(pkgBase, pkgManifest.main)
-            await fs.copyFile(path.join(koffiBase, 'build', 'koffi', koffiBuild, 'koffi.node'), destinationBinary)
+            await fs.copyFile(path.join(koffiBase, 'build', 'koffi', build, 'koffi.node'), destinationBinary)
 
             // Update the package's package.json.
             const [ platform, arch, libc ] = cream.split('-') as [ string, string, string | undefined ]
@@ -123,7 +124,7 @@ try {
         }
         console.groupEnd()
 
-        // Update our main package:
+        // Update our main package (koffi-cream):
         // - update version and optionalDependencies in package.json
         // - copy index.d.ts from Koffi
         console.info('Updating main package...')
@@ -133,7 +134,7 @@ try {
         await json.write(mainManifest)
 
         // Patch and write the typings (index.d.ts) in case they were updated.
-        // (patching is no longer necessary since Koffi 2.12.3 (https://github.com/Koromix/rygel/pull/89), but leaving as is anyway)
+        // (patching is no longer necessary since Koffi 2.12.3 (https://github.com/Koromix/rygel/pull/89), but leaving in anyway)
         const typings = await fs.readFile(path.join(koffiBase, koffiManifest.types))
             .then(buf => buf.toString())
             .then(str => str.replace(/declare module (["'])koffi\1/, "declare module $1koffi-cream$1"))
