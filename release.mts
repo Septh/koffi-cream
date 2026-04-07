@@ -2,6 +2,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import fs from 'node:fs/promises'
 import readline from 'node:readline/promises'
+import { styleText } from 'node:util'
 import semver from 'semver'
 import spawn from 'nano-spawn'
 import json from 'magic-json'
@@ -22,20 +23,25 @@ interface PackageJson {
     optionalDependencies: Record<string, string>
 }
 
-// This maps the various Koffi builds we support to our Cream packages.
-const supportedBuilds: Record<string, string> = {
+// This maps the various Koffi builds we know and support to our Cream packages.
+const supportedBuilds: Record<string, string | false> = {
     darwin_arm64:   'darwin-arm64',
     darwin_x64:     'darwin-x64',
     freebsd_arm64:  'freebsd-arm64',
+    freebsd_ia32:   false,
     freebsd_x64:    'freebsd-x64',
     linux_arm64:    'linux-arm64-glibc',
+    linux_armhf:    false,
+    linux_ia32:     false,
     linux_loong64:  'linux-loong64',
     linux_riscv64d: 'linux-riscv64',
     linux_x64:      'linux-x64-glibc',
     musl_arm64:     'linux-arm64-musl',
     musl_x64:       'linux-x64-musl',
+    openbsd_ia32:   false,
     openbsd_x64:    'openbsd-x64',
     win32_arm64:    'win32-arm64',
+    win32_ia32:     false,
     win32_x64:      'win32-x64',
 }
 
@@ -43,9 +49,9 @@ try {
     debugger
     const DEBUG = !!process.env['DEBUG']
 
-    // Check availability of `import.meta.dirname` and `import.meta.resolve`.
-    if (!semver.satisfies(process.versions.node, '^20.11.0 || >= 22'))
-        throw new Error('This script requires NodeJS 20.11.0+ or 22+')
+    // Check availability of used APIs.
+    if (!semver.satisfies(process.versions.node, '>= 22'))
+        throw new Error('This script requires NodeJS 22+')
 
     // Ensure the script is run from the root of the monorepo.
     process.chdir(import.meta.dirname)
@@ -53,15 +59,13 @@ try {
     // Get the version of Koffi currently installed in the repo.
     const koffiBase = fileURLToPath(new URL('./', import.meta.resolve('koffi')))
     const koffiManifest = await json.fromFile<PackageJson>(path.join(koffiBase, 'package.json'))
-    if (typeof koffiManifest.version !== 'string' || typeof koffiManifest.types !== 'string')
-        throw new Error('Something is wrong in koffi/package.json')
 
     console.info(`Koffi version ${koffiManifest.version} found at ${koffiBase}`)
     if (semver.major(koffiManifest.version) !== 2)
         throw new Error('This script only supports Koffi 2.x')
 
     // Check the latest version of Koffi on npm.
-    console.info("Checking latest version of Koffi on the npm registry...")
+    console.info("Checking latest version of Koffi in the npm registry...")
     const { stdout: koffiLatest } = await spawn('npm', [ 'view', 'koffi@latest', 'version' ])
     if (semver.gt(koffiLatest, koffiManifest.version)) {
         const rl = readline.createInterface(process.stdin, process.stderr)
@@ -77,7 +81,7 @@ try {
 
     // Do we need to update?
     const repoManifest = await json.fromFile<PackageJson>('package.json')
-    if (semver.lte(koffiManifest.version, repoManifest.version))
+    if (semver.lte(koffiManifest.version, repoManifest.version) && !DEBUG)
         console.info("Nothing to update.")
     else {
         const CREAM_PACKAGES = path.resolve('packages', '@koffi')       // Where individual packages are stored
@@ -88,41 +92,50 @@ try {
         // - copying the koffi.node binary to the package's directory
         // - updating the package's package.json `version`, `os`, `cpu` and `libc` fields
         // - updating the main package's package.json `version` and `optionalDependencies` fields
-        console.group('Packaging...')
-        const supportedPackages: Record<string, string> = {}
+        console.log('Packaging...')
         const copiedBinaries: string[] = []
-        for (const build in supportedBuilds) {
+        const optionalDependencies: Record<string, string> = {}
+        for await (const binary of fs.glob('**/*.node', { cwd: koffiBase })) {
+            const build = path.basename(path.dirname(binary))
             const cream = supportedBuilds[build]
-            process.stdout.write(`${build} => ${cream}...`)
 
-            // Make sure we have a package for this build and read its manifest.
-            const pkgBase = path.join(CREAM_PACKAGES, cream)
-            if (!await fs.stat(pkgBase).then(stat => stat.isDirectory()).catch(() => false)) {
-                console.groupEnd()
-                throw new Error(`Unsupported Koffi build ${build}`)
+            process.stdout.write(`  ${build} `)
+            if (cream) {
+                process.stdout.write(`=> ${cream}... `)
+
+                // Read this build's manifest.
+                const pkgBase = path.join(CREAM_PACKAGES, cream)
+                const pkgManifest = await json.fromFile<PackageJson>(path.join(pkgBase, 'package.json'))
+
+                // Copy the big binary.
+                const srcBinary = path.join(koffiBase, binary)
+                const dstBinary = path.join(pkgBase, pkgManifest.main)
+                await fs.copyFile(srcBinary, dstBinary)
+
+                // Update the package's package.json.
+                const [ platform, arch, libc ] = cream.split('-') as [ string, string, string | undefined ]
+                pkgManifest.name = `@septh/koffi-${cream}`
+                pkgManifest.version = koffiManifest.version
+                pkgManifest.os = [ platform ]
+                pkgManifest.cpu = [ arch ]
+                if (libc)
+                    pkgManifest.libc = [ libc ]
+                await json.write(pkgManifest)
+
+                // Remember this dependency and binary.
+                optionalDependencies[pkgManifest.name] = pkgManifest.version
+                copiedBinaries.push(dstBinary)
+
+                console.log('ok')
             }
-            const pkgManifest = await json.fromFile<PackageJson>(path.join(pkgBase, 'package.json'))
-
-            // Copy the big binary.
-            const destinationBinary = path.join(pkgBase, pkgManifest.main)
-            await fs.copyFile(path.join(koffiBase, 'build', 'koffi', build, 'koffi.node'), destinationBinary)
-
-            // Update the package's package.json.
-            const [ platform, arch, libc ] = cream.split('-') as [ string, string, string | undefined ]
-            pkgManifest.name = `@septh/koffi-${cream}`
-            pkgManifest.version = koffiManifest.version
-            pkgManifest.os = [ platform ]
-            pkgManifest.cpu = [ arch ]
-            pkgManifest.libc = libc ? [ libc ] : undefined
-            await json.write(pkgManifest)
-
-            // Remember this dependency and binary.
-            supportedPackages[pkgManifest.name] = pkgManifest.version
-            copiedBinaries.push(destinationBinary)
-
-            console.log('ok')
+            else if (cream === false) {
+                console.log(styleText('yellow', 'skipped'))
+            }
+            else {
+                console.log(styleText('redBright', 'unknown'))
+                throw new Error(`Unknown binary ${build}`)
+            }
         }
-        console.groupEnd()
 
         // Update our main package (koffi-cream):
         // - update version and optionalDependencies in package.json
@@ -130,15 +143,13 @@ try {
         console.info('Updating main package...')
         const mainManifest = await json.fromFile<PackageJson>(path.join(MAIN_PACKAGE, 'package.json'))
         mainManifest.version = koffiManifest.version
-        mainManifest.optionalDependencies = supportedPackages
+        mainManifest.optionalDependencies = optionalDependencies
         await json.write(mainManifest)
 
-        // Patch and write the typings (index.d.ts) in case they were updated.
-        // (patching is no longer necessary since Koffi 2.12.3 (https://github.com/Koromix/rygel/pull/89), but leaving in anyway)
-        const typings = await fs.readFile(path.join(koffiBase, koffiManifest.types))
-            .then(buf => buf.toString())
-            .then(str => str.replace(/declare module (["'])koffi\1/, "declare module $1koffi-cream$1"))
-        await fs.writeFile(path.join(MAIN_PACKAGE, mainManifest.types), typings)
+        // Copy the typings (index.d.ts) in case they were updated.
+        const srcTypes = path.join(koffiBase, koffiManifest.types)
+        const dstTypes = path.join(MAIN_PACKAGE, mainManifest.types)
+        await fs.cp(srcTypes, dstTypes)
 
         // And now, publish'em all!
         let success = false
@@ -150,6 +161,7 @@ try {
 
             success = true
         }
+        // Note: no catch block here, the outer catch block will be executed afer this finally block
         finally {
             console.info('Cleaning up...')
             await Promise.all(copiedBinaries.map(bin => fs.rm(bin)))
