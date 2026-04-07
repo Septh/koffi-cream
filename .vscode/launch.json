@@ -5,12 +5,9 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Run with ts-run",
+            "name": "Run release.mts",
             "type": "node",
             "request": "launch",
-            "runtimeArgs": [
-                "--import=@septh/ts-run"
-            ],
             "cwd": "${workspaceFolder}",
             "program": "release.mts",
             "args": [],
@@ -23,7 +20,7 @@
             "skipFiles": [
                 "<node_internals>/**",
                 "**/node_modules/**"
-            ],
-        },
+            ]
+        }
     ]
 }
