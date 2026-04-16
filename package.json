@@ -8,14 +8,14 @@
     "release": "ts-run ./release.mts"
   },
   "workspaces": [
-    "./packages/@koffi/*",
+    "./packages/@septh/*",
     "./packages/koffi-cream"
   ],
   "devDependencies": {
     "@septh/ts-run": "^2.0.0",
     "@types/node": "^22.14.1",
     "@types/semver": "^7.7.0",
-    "koffi": "2.15.6",
+    "koffi": "2.16.0",
     "magic-json": "^1.1.4",
     "nano-spawn": "^2.0.0",
     "semver": "^7.7.1"

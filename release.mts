@@ -47,7 +47,9 @@ const supportedBuilds: Record<string, string | false> = {
 
 try {
     debugger
-    const DEBUG = !!process.env['DEBUG']
+    const DRY_RUN = !!process.env['DEBUG'] || process.argv[2] === '--dry-run' || process.argv[2] === '--preview'
+    if (DRY_RUN)
+        console.log(styleText('yellow', 'Running in preview mode.'))
 
     // Check availability of used APIs.
     if (!semver.satisfies(process.versions.node, '>= 22'))
@@ -81,11 +83,11 @@ try {
 
     // Do we need to update?
     const repoManifest = await json.fromFile<PackageJson>('package.json')
-    if (semver.lte(koffiManifest.version, repoManifest.version) && !DEBUG)
+    if (semver.lte(koffiManifest.version, repoManifest.version) && !DRY_RUN)
         console.info("Nothing to update.")
     else {
         const MAIN_PACKAGE   = path.resolve('packages', 'koffi-cream')  // Where our main package is stored
-        const CREAM_PACKAGES = path.resolve('packages', '@koffi')       // Where individual packages are stored
+        const CREAM_PACKAGES = path.resolve('packages', '@septh')       // Where individual packages are stored
 
         // Package each koffi build we support as an optional dependency to our main package.
         // This involves:
@@ -155,7 +157,7 @@ try {
         try {
             console.info('Publishing all packages with npm...')
             await spawn('npm', [
-                'publish', '--workspaces', '--access=public', DEBUG ? '--dry-run' : ''
+                'publish', '--workspaces', '--access=public', DRY_RUN ? '--dry-run' : ''
             ].filter(Boolean), { stdio: 'inherit' })
 
             success = true
@@ -166,7 +168,7 @@ try {
             await Promise.all(copiedBinaries.map(bin => fs.rm(bin)))
             await spawn('git', [ 'checkout', 'packages' ])
 
-            if (success && !DEBUG) {
+            if (success && !DRY_RUN) {
                 console.info('Bumping repo version...')
                 await spawn('npm', [ 'version', '--no-git-tag-version', koffiManifest.version ])
 
