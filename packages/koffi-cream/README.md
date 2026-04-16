@@ -14,7 +14,7 @@ const some_func = lib.func('int some_func(int a, int b)')
 > [!IMPORTANT]
 > **koffi-cream is neither a fork nor a patch. It *is* the original Koffi**, only packaged differently to avoid downloading a *previously* megalithic[^1] package *still* bloated with files unnecessary to the average user[^2].
 
-[^1]: ~~As of 2.14.0, Koffi weights 16.9 MB compressed and 86 MB uncompressed.~~ Not any more. Niels did an impressive work at shrinking the package size down to 41.4 MB for 2.15.4 and 28.7 MB for 2.16.0. It's still quite big (fun fact: it's about the same size as the TypeScript 6.0 compiler :-) but it's definitely a huge improvement. Point 2 below still stands, though.
+[^1]: ~~As of 2.14.0, Koffi weights 16.9 MB compressed and 86 MB uncompressed.~~ Not any more. Niels did an impressive work at shrinking the package size down to 41.4 MB for 2.15.4 and 28.7 MB for 2.16.0. This is still quite big (fun fact: it's about the same size as the TypeScript 6.0 compiler :-) but it's definitely a huge improvement. Point 2 below still stands, though.
 [^2]: Koffi's package includes 18 native binaries (of which 17 are not compatible with your platform), the build tools and the full C++/asm source code.
 
 
@@ -63,7 +63,7 @@ I do not plan to add the other builds. If you need one of these, you'll have to 
 ## Version numbering
 To make things easy on the user, `koffi-cream`'s version number will always be aligned with Koffi's.
 
-Hence, there is no `koffi-cream` 1.x or 2.0; the first version published is 2.11.0 which ships with Koffi 2.11.0 binaries.
+Hence, there is no `koffi-cream` 1.x or 2.0; the first version published was 2.11.0 which shipped with Koffi 2.11.0 binaries.
 
 
 ## Related
