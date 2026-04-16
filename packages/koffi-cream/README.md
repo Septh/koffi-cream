@@ -12,25 +12,25 @@ const some_func = lib.func('int some_func(int a, int b)')
 ```
 
 > [!IMPORTANT]
-> **koffi-cream is neither a fork nor a patch. It *is* the original Koffi**, only packaged differently to avoid downloading a megalithic[^1] package bloated with files unnecessary to the average user[^2].
+> **koffi-cream is neither a fork nor a patch. It *is* the original Koffi**, only packaged differently to avoid downloading a *previously* megalithic[^1] package bloated with files unnecessary to the average user[^2].
 
-[^1]: As of 2.14.0, Koffi weights 16.9 MB compressed and 86 MB uncompressed.
-[^2]: Koffi's package includes 18 native binaries (of which 17 are not compatible with your platform), the build tools and the full source code.
+[^1]: ~~As of 2.14.0, Koffi weights 16.9 MB compressed and 86 MB uncompressed.~~ Not any more. Niels did an impressive work at shrinking the package size on 2.15.4 (down to 41.4 MB) and 2.16.0 (down to 28.7 MB). It's still big (func fact: it's about the same size as the TypeScript 6.0 compiler :-) but it's definitely a huge improvement. Point 2 below still stands, though.
+[^2]: Koffi's package includes 18 native binaries (of which 17 are not compatible with your platform), the build tools and the full C++/asm source code.
 
 
 ## The why and the how
 The discussion at https://github.com/Koromix/koffi/issues/201 explains why I decided to create `koffi-cream`.
 
-`koffi-cream` repackages Koffi using the same strategy as many popular packages in the JavaScript community like `esbuild` or `swc`: by leveraging the `optionalDependencies`, `os`, `cpu` and `libc` properties in `package.json`.
+`koffi-cream` repackages Koffi using the same strategy as many popular packages in the JavaScript community like `Rollup`, `esbuild` or `swc`: by leveraging the `optionalDependencies`, `os`, `cpu` and `libc` properties in `package.json`.
 
 This way, when you install `koffi-cream`, your package manager will only download and install the build that is right for your platform. For example, on Windows AMD/Intel 64 bit, your package manager will install:
-- `koffi-cream` (this package): 5.1 kB compressed / 19.8 kB uncompressed
-- `@septh/koffi-win32-x64`: 536.2 kB compressed / 2.4 MB uncompressed
+- `koffi-cream` (this package): ≃ 5 kB compressed / ≃ 20 kB uncompressed
+- `@septh/koffi-win32-x64` (the binary): ≃ 400 kB compressed / ≃ 1.6 MB uncompressed
 
-**That's 74.2% off compared to the original Koffi package!**
+**That's 94.5% off compared to the original Koffi package!**
 
 > [!NOTE]
-> The `libc` property, used to distinguish Linux distros between gnu and musl, is only supported by `npm 10.4.0` and later, `pnpm 7.1.0` and later, and `yarn 3.2.0` and later.
+> The `libc` property, used to distinguish Linux distros between gnu and musl, is supported by `npm 10.4.0` and later, `pnpm 7.1.0` and later, and `yarn 3.2.0` and later.
 
 
 ## Available packages

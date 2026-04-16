@@ -12,15 +12,15 @@ interface PackageJson {
     name: string
     version: string
 
+    // Used in packages/koffi-cream/package.json
+    types: string
+    optionalDependencies: Record<string, string>
+
     // Used in packages/@koffi/*/package.json
     main: string
     os: string[]
     cpu: string[]
     libc?: string[]
-
-    // Used in packages/koffi-cream/package.json
-    types: string
-    optionalDependencies: Record<string, string>
 }
 
 // This maps the various Koffi builds we know and support to our Cream packages.
@@ -84,8 +84,8 @@ try {
     if (semver.lte(koffiManifest.version, repoManifest.version) && !DEBUG)
         console.info("Nothing to update.")
     else {
-        const CREAM_PACKAGES = path.resolve('packages', '@koffi')       // Where individual packages are stored
         const MAIN_PACKAGE   = path.resolve('packages', 'koffi-cream')  // Where our main package is stored
+        const CREAM_PACKAGES = path.resolve('packages', '@koffi')       // Where individual packages are stored
 
         // Package each koffi build we support as an optional dependency to our main package.
         // This involves:
@@ -103,16 +103,10 @@ try {
             if (cream) {
                 process.stdout.write(`=> ${cream}... `)
 
-                // Read this build's manifest.
+                // Read and update this build's manifest.
                 const pkgBase = path.join(CREAM_PACKAGES, cream)
                 const pkgManifest = await json.fromFile<PackageJson>(path.join(pkgBase, 'package.json'))
 
-                // Copy the big binary.
-                const srcBinary = path.join(koffiBase, binary)
-                const dstBinary = path.join(pkgBase, pkgManifest.main)
-                await fs.copyFile(srcBinary, dstBinary)
-
-                // Update the package's package.json.
                 const [ platform, arch, libc ] = cream.split('-') as [ string, string, string | undefined ]
                 pkgManifest.name = `@septh/koffi-${cream}`
                 pkgManifest.version = koffiManifest.version
@@ -121,6 +115,11 @@ try {
                 if (libc)
                     pkgManifest.libc = [ libc ]
                 await json.write(pkgManifest)
+
+                // Copy the big binary.
+                const srcBinary = path.join(koffiBase, binary)
+                const dstBinary = path.join(pkgBase, pkgManifest.main)
+                await fs.copyFile(srcBinary, dstBinary)
 
                 // Remember this dependency and binary.
                 optionalDependencies[pkgManifest.name] = pkgManifest.version
@@ -161,7 +160,7 @@ try {
 
             success = true
         }
-        // Note: no catch block here, the outer catch block will be executed afer this finally block
+        // Note: no catch block here, the outer catch block will be executed after this finally block
         finally {
             console.info('Cleaning up...')
             await Promise.all(copiedBinaries.map(bin => fs.rm(bin)))
