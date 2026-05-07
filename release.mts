@@ -4,7 +4,7 @@ import fs from 'node:fs/promises'
 import readline from 'node:readline/promises'
 import { styleText } from 'node:util'
 import semver from 'semver'
-import spawn from 'nano-spawn'
+import spawn, { type SubprocessError } from 'nano-spawn'
 import json from 'magic-json'
 
 // Fields of interest in package.json.
@@ -155,6 +155,15 @@ try {
         // And now, publish'em all!
         let success = false
         try {
+            console.info('Checking npm user...')
+            const loggedIn = await spawn('npm', [ 'whoami' ]).catch((err: SubprocessError) => err)
+            if (loggedIn instanceof Error) {
+                if (loggedIn.stderr.includes('E401') || loggedIn.stderr.includes('ENEEDAUTH')) {
+                    await spawn('npm', [ 'login' ], { stdio: 'inherit' })
+                }
+                else throw loggedIn
+            }
+
             console.info('Publishing all packages with npm...')
             await spawn('npm', [
                 'publish', '--workspaces', '--access=public', DRY_RUN ? '--dry-run' : ''
