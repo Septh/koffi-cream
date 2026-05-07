@@ -18,6 +18,12 @@ const some_func = lib.func('int some_func(int a, int b)')
 [^2]: Koffi's package includes 18 native binaries (of which 17 are not compatible with your platform), the build tools and the full C++/asm source code.
 
 
+> [!IMPORTANT]
+> **koffi-cream currently only focuses on Koffi 2.x**. While [Koffi 3.0 is on its way](https://www.npmjs.com/package/koffi?activeTab=versions) (@next is 3.0.0-alpha.9 at the time of writing), [it is not clear yet which publishing strategy Niels will adopt](https://github.com/Koromix/koffi/issues/201#issuecomment-4274256240). Should he decide to go with the split package format, then this will be the end of koffi-cream and I will only follow critical updates to the 2.x line.
+>
+> Otherwise, well... who knows? :)
+
+
 ## The why and the how
 The discussion at https://github.com/Koromix/koffi/issues/201 explains why I decided to create `koffi-cream`.
 
