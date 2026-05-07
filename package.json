@@ -1,11 +1,12 @@
 {
   "private": true,
   "name": "koffi-cream-monorepo",
-  "version": "2.16.1",
+  "version": "2.16.2",
   "author": "Stephan 'Septh' Schreiber <septh@sfr.fr> (https://github.com/Septh)",
   "license": "MIT",
   "scripts": {
-    "release": "ts-run ./release.mts"
+    "prerelease": "npm login",
+    "release": "node ./release.mts"
   },
   "workspaces": [
     "./packages/@septh/*",
@@ -15,7 +16,7 @@
     "@septh/ts-run": "^2.0.0",
     "@types/node": "^22.14.1",
     "@types/semver": "^7.7.0",
-    "koffi": "2.16.1",
+    "koffi": "2.16.2",
     "magic-json": "^1.1.4",
     "nano-spawn": "^2.0.0",
     "semver": "^7.7.1"
