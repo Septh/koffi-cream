@@ -67,8 +67,8 @@ try {
         throw new Error('This script only supports Koffi 2.x')
 
     // Check the latest version of Koffi on npm.
-    console.info("Checking latest version of Koffi in the npm registry...")
-    const { stdout: koffiLatest } = await spawn('npm', [ 'view', 'koffi@latest', 'version' ])
+    console.info("Checking latest Koffi 2.x in the npm registry...")
+    const koffiLatest = await spawn('npm', [ 'view', 'koffi@2', 'version', '--json' ]).then(({ stdout }) => JSON.parse(stdout).pop())
     if (semver.gt(koffiLatest, koffiManifest.version)) {
         const rl = readline.createInterface(process.stdin, process.stderr)
         let answer = ''
@@ -83,7 +83,7 @@ try {
 
     // Do we need to update?
     const repoManifest = await json.fromFile<PackageJson>('package.json')
-    if (semver.lte(koffiManifest.version, repoManifest.version) && !DRY_RUN)
+    if (semver.lte(koffiManifest.version, repoManifest.version))
         console.info("Nothing to update.")
     else {
         const MAIN_PACKAGE   = path.resolve('packages', 'koffi-cream')  // Where our main package is stored
