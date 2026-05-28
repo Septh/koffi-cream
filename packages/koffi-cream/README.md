@@ -19,9 +19,9 @@ const some_func = lib.func('int some_func(int a, int b)')
 
 
 > [!IMPORTANT]
-> **koffi-cream currently only focuses on Koffi 2.x**. While [Koffi 3.0 is on its way](https://www.npmjs.com/package/koffi?activeTab=versions) (@next is 3.0.0-alpha.9 at the time of writing), [it is not clear yet which publishing strategy Niels will adopt](https://github.com/Koromix/koffi/issues/201#issuecomment-4274256240). Should he decide to go with the split package format, then this will be the end of koffi-cream and I will only follow critical updates to the 2.x line.
+> **koffi-cream exclusively focuses on Koffi 2.x**. [Koffi 3.0 is out](https://www.npmjs.com/package/koffi) and it uses the split package format. Yeah!
 >
-> Otherwise, well... who knows? :)
+> This does not mean the end for koffi-cream, though: [as Niels wrote](https://github.com/Koromix/koffi/issues/201#issuecomment-4475793049), he might publish 2.17 at some point. When the time comes, I'll update koffi-cream accordingly.
 
 
 ## The why and the how
